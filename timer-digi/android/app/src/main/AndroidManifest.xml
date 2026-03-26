@@ -30,7 +30,12 @@
 </service>
 <service
     android:name=".OverlayService"
-    android:exported="false" />
+    android:foregroundServiceType="specialUse"
+    android:exported="false">
+    <property 
+        android:name="android.app.PROPERTY_SPECIAL_USE_FQS_SUBTYPE" 
+        android:value="YouTube usage tracking and focus timer overlay" />
+</service>
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>

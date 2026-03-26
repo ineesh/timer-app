@@ -89,30 +89,27 @@ protected void onServiceConnected() {
 
     // 🔥 Debounce logic (anti-flicker)
     private void scheduleCheck() {
-        if (checkRunnable != null) {
-            handler.removeCallbacks(checkRunnable);
+  if (checkRunnable != null) {
+        handler.removeCallbacks(checkRunnable);
+    }
+
+    checkRunnable = () -> {
+        boolean isYouTube = isYouTubeActive();
+
+        if (isYouTube != lastState) {
+            lastState = isYouTube;
+            Log.d(TAG, "FINAL STATE: " + isYouTube);
+
+            // 🔥 FIX: Actually send the broadcast
+            Intent intent = new Intent("YT_STATUS");
+            intent.putExtra("active", isYouTube);
+            // setPackage ensures only YOUR app catches this (required for modern Android)
+            intent.setPackage(getPackageName()); 
+            sendBroadcast(intent);
         }
+    };
 
-        checkRunnable = () -> {
-            boolean isYouTube = isYouTubeActive();
-
-            if (isYouTube != lastState) {
-                lastState = isYouTube;
-
-                Log.d(TAG, "FINAL STATE: " + isYouTube);
-
-                // 🔥 Broadcast to React Native
-                // (optional - you can remove if not needed)
-                /*
-                Intent intent = new Intent("YT_STATUS");
-                intent.putExtra("active", isYouTube);
-                intent.setPackage(getPackageName());
-                sendBroadcast(intent);
-                */
-            }
-        };
-
-        handler.postDelayed(checkRunnable, 500); // 🔥 500ms debounce
+    handler.postDelayed(checkRunnable, 500);
     }
 
     // 🔥 Core detection logic

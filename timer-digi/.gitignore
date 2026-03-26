@@ -40,4 +40,9 @@ app-example
 
 # generated native folders
 /ios
-/android
+
+
+# Expo
+.expo
+dist/
+web-build/

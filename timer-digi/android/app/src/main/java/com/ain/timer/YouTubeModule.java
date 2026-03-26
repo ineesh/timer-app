@@ -11,22 +11,28 @@ import android.os.Build;
 
 public class YouTubeModule extends ReactContextBaseJavaModule {
     private BroadcastReceiver receiver;
+
     public YouTubeModule(ReactApplicationContext reactContext) {
         super(reactContext);
         
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                boolean active = intent.getBooleanExtra("active", false);
-                getReactApplicationContext()
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit("YT_STATUS", active);
+                // Ensure the bridge is alive before sending data to JS
+                if (getReactApplicationContext().hasActiveCatalystInstance()) {
+                    boolean active = intent.getBooleanExtra("active", false);
+                    getReactApplicationContext()
+                        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                        .emit("YT_STATUS", active);
+                }
             }
         };
 
         IntentFilter filter = new IntentFilter("YT_STATUS");
+        
+        // Using RECEIVER_NOT_EXPORTED for internal app communication (Android 14+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            reactContext.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+            reactContext.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED);
         } else {
             reactContext.registerReceiver(receiver, filter);
         }
@@ -36,13 +42,14 @@ public class YouTubeModule extends ReactContextBaseJavaModule {
     public String getName() {
         return "YouTubeModule";
     }
+
     @Override
-public void invalidate() {
-    super.invalidate();
-    try {
-        getReactApplicationContext().unregisterReceiver(receiver);
-    } catch (Exception e) {
-        // ignore
+    public void invalidate() {
+        super.invalidate();
+        try {
+            getReactApplicationContext().unregisterReceiver(receiver);
+        } catch (Exception e) {
+            // ignore
+        }
     }
-}
 }
