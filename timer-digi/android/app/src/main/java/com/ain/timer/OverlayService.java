@@ -18,18 +18,18 @@ public class OverlayService extends Service {
     private TextView timerText;
 
     private Handler handler = new Handler();
-    // private int seconds = 0;
+    private int seconds = 0;
 
-    // private Runnable timerRunnable = new Runnable() {
-    //     @Override
-    //     public void run() {
-    //         seconds++;
-    //         int mins = seconds / 60;
-    //         int secs = seconds % 60;
-    //         timerText.setText(mins + ":" + String.format("%02d", secs));
-    //         handler.postDelayed(this, 1000);
-    //     }
-    // };
+    private Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int mins = seconds / 60;
+            int secs = seconds % 60;
+            timerText.setText(mins + ":" + String.format("%02d", secs));
+            seconds++;
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -85,15 +85,24 @@ public class OverlayService extends Service {
 
         windowManager.addView(bubbleView, params);
 
-        // handler.post(timerRunnable);
-        timerText.setText("Tracking...");
+        // text will be set by timerRunnable
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            seconds = intent.getIntExtra("initialSeconds", 0);
+        }
+        handler.removeCallbacks(timerRunnable);
+        handler.post(timerRunnable);
+        return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (bubbleView != null) windowManager.removeView(bubbleView);
-        // handler.removeCallbacks(timerRunnable);
+        handler.removeCallbacks(timerRunnable);
     }
 
     @Override

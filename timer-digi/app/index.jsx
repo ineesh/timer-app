@@ -72,7 +72,7 @@ if (isWatchingYouTube) {
   console.log("YouTube OPENED");
 
 try { //start the bubble 
-  await NativeModules.OverlayModule.startOverlay();
+  await NativeModules.OverlayModule.startOverlay(secondsCounter);
 } catch (e) {
   console.log("Overlay start error", e);
 }
@@ -85,7 +85,7 @@ try { //start the bubble
 
       await notifee.displayNotification({
         id: notification.id,
-        body: `Watching YouTube: ${Math.floor(secondsCounter / 60)}m ${secondsCounter % 60}s`,
+        body: `Tracking...`,
         android: { ...notification.android },
       });
     }, 1000);

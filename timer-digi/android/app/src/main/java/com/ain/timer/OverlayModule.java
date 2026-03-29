@@ -47,9 +47,10 @@ public class OverlayModule extends ReactContextBaseJavaModule {
             reactContext.startActivity(intent);
         }
     }
-        @ReactMethod
-    public void startOverlay() {
+    @ReactMethod
+    public void startOverlay(double initialSeconds) {
         Intent intent = new Intent(getReactApplicationContext(), OverlayService.class);
+        intent.putExtra("initialSeconds", (int) initialSeconds);
         getReactApplicationContext().startService(intent);
     }
     @ReactMethod
