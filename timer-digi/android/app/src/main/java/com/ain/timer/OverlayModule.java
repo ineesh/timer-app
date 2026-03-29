@@ -58,4 +58,39 @@ public class OverlayModule extends ReactContextBaseJavaModule {
         Intent intent = new Intent(getReactApplicationContext(), OverlayService.class);
         getReactApplicationContext().stopService(intent);
     }
+
+    // ✅ Check accessibility permission
+    @ReactMethod
+    public void isAccessibilityServiceEnabled(Promise promise) {
+        try {
+            int accessibilityEnabled = 0;
+            try {
+                accessibilityEnabled = Settings.Secure.getInt(
+                        reactContext.getContentResolver(),
+                        android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+            } catch (Settings.SettingNotFoundException e) {
+            }
+            if (accessibilityEnabled == 1) {
+                String settingValue = Settings.Secure.getString(
+                        reactContext.getContentResolver(),
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+                if (settingValue != null) {
+                    boolean enabled = settingValue.contains(reactContext.getPackageName() + "/" + YouTubeDetector.class.getName());
+                    promise.resolve(enabled);
+                    return;
+                }
+            }
+            promise.resolve(false);
+        } catch (Exception e) {
+            promise.reject("ERROR", e);
+        }
+    }
+
+    // ✅ Open accessibility settings
+    @ReactMethod
+    public void openAccessibilitySettings() {
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        reactContext.startActivity(intent);
+    }
 }

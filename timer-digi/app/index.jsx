@@ -86,7 +86,10 @@ try { //start the bubble
       await notifee.displayNotification({
         id: notification.id,
         body: `Tracking...`,
-        android: { ...notification.android },
+        android: { 
+          ...notification.android,
+          onlyAlertOnce: true 
+        },
       });
     }, 1000);
   }
@@ -148,6 +151,15 @@ export default function App() {
   }
 
   // ✅ Continue if permission granted
+  const isAccessGranted = await NativeModules.OverlayModule.isAccessibilityServiceEnabled();
+  if (!isAccessGranted) {
+    console.log("Accessibility permission not granted");
+    NativeModules.OverlayModule.openAccessibilitySettings();
+    alert("Please enable the 'Timer Digi' Accessibility Service (under Installed/Downloaded Apps) and press Start again.");
+    return; // ⛔ stop here
+  }
+
+  // ✅ Continue if ALL permissions granted
   const channelId = await notifee.createChannel({
     id: 'youtube-tracker',
     name: 'YouTube Tracker Service',
@@ -161,6 +173,7 @@ export default function App() {
       asForegroundService: true,
       ongoing: true,
       pressAction: { id: 'default' },
+      onlyAlertOnce: true, // <--- MAGIC FIX HERE TOO
     },
   });
 
