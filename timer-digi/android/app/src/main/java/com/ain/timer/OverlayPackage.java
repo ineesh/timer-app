@@ -15,6 +15,7 @@ public class OverlayPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new OverlayModule(reactContext));
+        modules.add(new LiveUpdateModule(reactContext));
         return modules;
     }
 

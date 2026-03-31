@@ -6,10 +6,11 @@
   <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WAKE_LOCK"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <!-- Android 16 specific status bar chip layout permission -->
+  <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS"/>
   <queries>
     <intent>
       <action android:name="android.intent.action.VIEW"/>
@@ -27,14 +28,6 @@
     <meta-data
         android:name="android.accessibilityservice"
         android:resource="@xml/service_config" />
-</service>
-<service
-    android:name=".OverlayService"
-    android:foregroundServiceType="specialUse"
-    android:exported="false">
-    <property 
-        android:name="android.app.PROPERTY_SPECIAL_USE_FQS_SUBTYPE" 
-        android:value="YouTube usage tracking and focus timer overlay" />
 </service>
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>

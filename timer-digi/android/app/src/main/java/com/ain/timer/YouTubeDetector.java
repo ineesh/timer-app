@@ -28,7 +28,6 @@ public class YouTubeDetector extends AccessibilityService {
     ));
 
     private Handler handler = new Handler();
-    private Runnable checkRunnable;
 
     private boolean lastState = false;
 
@@ -65,8 +64,7 @@ protected void onServiceConnected() {
 
     info.eventTypes =
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED |
-            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED |
-            AccessibilityEvent.TYPE_WINDOWS_CHANGED; // 🔥 IMPORTANT
+            AccessibilityEvent.TYPE_WINDOWS_CHANGED; // 🔥 Battery saver: removed CONTENT_CHANGED
 
     info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
 
@@ -88,29 +86,30 @@ protected void onServiceConnected() {
                 || pkg.startsWith("com.samsung.android");
     }
 
-    // 🔥 Debounce logic (anti-flicker)
-    private void scheduleCheck() {
-  if (checkRunnable != null) {
-        handler.removeCallbacks(checkRunnable);
-    }
+    // 🔥 Memory optimization: Create runnable ONCE to avoid GC thrashing
+    private Runnable checkRunnable = new Runnable() {
+        @Override
+        public void run() {
+            boolean isYouTube = isYouTubeActive();
 
-    checkRunnable = () -> {
-        boolean isYouTube = isYouTubeActive();
+            if (isYouTube != lastState) {
+                lastState = isYouTube;
+                Log.d(TAG, "FINAL STATE: " + isYouTube);
 
-        if (isYouTube != lastState) {
-            lastState = isYouTube;
-            Log.d(TAG, "FINAL STATE: " + isYouTube);
-
-            // 🔥 FIX: Actually send the broadcast
-            Intent intent = new Intent("YT_STATUS");
-            intent.putExtra("active", isYouTube);
-            // setPackage ensures only YOUR app catches this (required for modern Android)
-            intent.setPackage(getPackageName()); 
-            sendBroadcast(intent);
+                // 🔥 Actually send the broadcast
+                Intent intent = new Intent("YT_STATUS");
+                intent.putExtra("active", isYouTube);
+                // setPackage ensures only YOUR app catches this (required for modern Android)
+                intent.setPackage(getPackageName()); 
+                sendBroadcast(intent);
+            }
         }
     };
 
-    handler.postDelayed(checkRunnable, 500);
+    // 🔥 Debounce logic (anti-flicker)
+    private void scheduleCheck() {
+        handler.removeCallbacks(checkRunnable);
+        handler.postDelayed(checkRunnable, 500);
     }
 
     // 🔥 Core detection logic
