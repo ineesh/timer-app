@@ -10,7 +10,7 @@
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ain.timer"
+      "bundleIdentifier": "com.vora.timer"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +28,7 @@
         "BIND_ACCESSIBILITY_SERVICE",
         "QUERY_ALL_PACKAGES"
       ],
-      "package": "com.ain.timer"
+      "package": "com.vora.timer"
     },
     "web": {
       "output": "static",
@@ -63,6 +63,12 @@
         }
       ],
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3e115703-bd65-4d72-bc8f-177eab988cee"
+      }
+    }
   }
 }
